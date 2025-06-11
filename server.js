@@ -26,8 +26,7 @@ const samplePaintings = [
   },
   {
     title: "Ocean",
-    image:
-      "https://hdqwalls.com/download/2048x1152/ocean-waves-at-sunset.com/ocean.jpg",
+    image: "https://hdqwalls.com/download/ocean-waves-at-sunset-2048x1152.jpg",
     price: 150,
   },
 ];
