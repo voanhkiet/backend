@@ -21,12 +21,12 @@ const paintingSchema = new mongoose.Schema({
 const samplePaintings = [
   {
     title: "Sunset",
-    image: "https://hdqwalls.com/download/ocean-waves-at-sunset-2048x1152.jpg",
+    image: "./imgages/sunset.jpg",
     price: 100,
   },
   {
     title: "Ocean",
-    image: "https://hdqwalls.com/download/ocean-waves-at-sunset-2048x1152.jpg",
+    image: "./imgages/ocean.jpg",
     price: 150,
   },
 ];
