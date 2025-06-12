@@ -29,12 +29,14 @@ const paintingSchema = new mongoose.Schema({
 const samplePaintings = [
   {
     title: "Sunset",
-    image: "/images/sunset.jpg",
+    image: "https://backend-ybh5.onrender.com/images/sunset.jpg",
+
     price: 100,
   },
   {
     title: "Ocean",
-    image: "/images/ocean.jpg",
+    image: "https://backend-ybh5.onrender.com/images/ocean.jpg",
+
     price: 150,
   },
 ];
