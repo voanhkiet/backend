@@ -13,7 +13,14 @@ mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-
+mongoose.connection.once("open", async () => {
+  try {
+    await mongoose.connection.db.collection("paintings").drop();
+    console.log("✅ Database deleted successfully!");
+  } catch (error) {
+    console.error("❌ Error deleting database:", error);
+  }
+});
 const paintingSchema = new mongoose.Schema({
   title: String,
   image: String,
