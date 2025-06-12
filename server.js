@@ -1,13 +1,13 @@
 /* eslint-disable no-undef */
 const express = require("express");
 const cors = require("cors");
-
+const path = require("path");
 const mongoose = require("mongoose");
 require("dotenv").config();
 const app = express();
 app.use(express.static("public"));
 // Ensure that images can be accessed
-app.use("/images", express.static(__dirname + "/public/images"));
+app.use("/images", express.static(path.join(__dirname + "/public/images")));
 app.use(cors());
 app.use(express.json());
 
