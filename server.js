@@ -21,12 +21,12 @@ const paintingSchema = new mongoose.Schema({
 const samplePaintings = [
   {
     title: "Sunset",
-    image: "./imgages/sunset.jpg",
+    image: "/imgages/sunset.jpg",
     price: 100,
   },
   {
     title: "Ocean",
-    image: "./imgages/ocean.jpg",
+    image: "/imgages/ocean.jpg",
     price: 150,
   },
 ];
