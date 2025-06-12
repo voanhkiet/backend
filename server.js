@@ -5,6 +5,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 require("dotenv").config();
 const app = express();
+app.use(express.static("public"));
 app.use(cors());
 app.use(express.json());
 
@@ -21,12 +22,12 @@ const paintingSchema = new mongoose.Schema({
 const samplePaintings = [
   {
     title: "Sunset",
-    image: "frontend/public/images/sunset.jpg",
+    image: "/images/sunset.jpg",
     price: 100,
   },
   {
     title: "Ocean",
-    image: "frontend/public/images/ocean.jpg",
+    image: "/images/ocean.jpg",
     price: 150,
   },
 ];
