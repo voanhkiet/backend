@@ -7,7 +7,7 @@ require("dotenv").config();
 const app = express();
 app.use(express.static("public"));
 // Ensure that images can be accessed
-app.use("/images", express.static(__dirname + "public/images"));
+app.use("/images", express.static(__dirname + "/public/images"));
 app.use(cors());
 app.use(express.json());
 
