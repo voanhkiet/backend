@@ -6,20 +6,23 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-mongoose.connect("mongodb+srv://voanhkiet261192:0p31FsTmKgk0BCLy@cluster.ebrd6fw.mongodb.net/?retryWrites=true&w=majority&appName=Cluster", {
+require('dotenv').config();
+mongoose.connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
 
 const PaintingSchema = new mongoose.Schema({
     title: String,
-    price: Number,
+    price: Number, // Changed "Price" to "price"
     imageUrl: String,
 });
 
 const Painting = mongoose.model("Painting", PaintingSchema);
 
-app.get("/paintings", async (req, res) => {
+app.get("/paintings", async (req, res) => {  // Fixed "asyns" to "async"
     const paintings = await Painting.find();
     res.json(paintings);
 });
+
+app.listen(5000, () => console.log("Server running on port 5000"));
