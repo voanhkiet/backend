@@ -5,7 +5,8 @@ const cors = require("cors");
 const app = express();
 app.use(express.json());
 app.use(cors());
-
+const authMiddleware = require("./middleware/authMiddleware");
+app.use(require("./middleware/errorHandler"));
 require('dotenv').config();
 mongoose.connect(process.env.MONGODB_URI);
 
@@ -35,7 +36,7 @@ app.post("/paintings", authMiddleware, async (req, res) => {
     }
 });
 
-app.use(require("./middleware/errorHandler"));
+
 
 
 
