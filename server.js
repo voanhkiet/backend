@@ -21,8 +21,25 @@ const PaintingSchema = new mongoose.Schema({
 const Painting = mongoose.model("Painting", PaintingSchema);
 
 app.get("/paintings", async (req, res) => {  // Fixed "asyns" to "async"
-    const paintings = await Painting.find();
+    const { page = 1, limit = 10} = req.query;
+    const paintings = await Painting.find()
+        .limit(limit * 1)
+        .skip((page - 1) * limit);
     res.json(paintings);
 });
+
+app.post("/paintings", authMiddleware, async (req, res) => {
+    try {
+        const newPainting = new Painting(req.body);
+        await newPainting.save();
+        res.status(201).json(newPainting);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+app.use(require("./middleware/errorHandler"));
+
+
 
 app.listen(5000, () => console.log("Server running on port 5000"));
