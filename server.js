@@ -1,6 +1,9 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const User = require("./models/User");
 
 const app = express();
 app.use(express.json());
@@ -17,6 +20,41 @@ const PaintingSchema = new mongoose.Schema({
 });
 
 const Painting = mongoose.model("Painting", PaintingSchema);
+
+// Register route
+app.post("/register", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const existing = await User.findOne({ email });
+        if (existing) return res.status(400).json({ message: "User already exists" });
+
+        const newUser = new User({ email, password });
+        await newUser.save();
+
+        res.status(201).json({ message: "User created" });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+// Login route
+app.post("/login", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({   email });
+        if (!user) return res.status(400).json({ message: "User not found" }); // Fixed "credentails" to "credentials"
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { 
+            expiresIn: "2h"
+         });
+
+         res.json({token});
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
 
 app.get("/paintings", async (req, res) => {  // Fixed "asyns" to "async"
     const { page = 1, limit = 10} = req.query;
