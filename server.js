@@ -128,5 +128,25 @@ app.post("/upload", upload.single("image"), async (req, res) => {
   }
 });
 
+app.post("/reset-password", async (req, res) => {
+  try {
+    let { email, newPassword } = req.body;
+    email = email.trim().toLowerCase();
+    newPassword = newPassword.trim();
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: "User not found" });
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ message: "Password reset successful" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+
 // 🚀 Start server
 app.listen(5000, () => console.log("Server running on port 5000"));
