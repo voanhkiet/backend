@@ -6,6 +6,8 @@ const jwt = require("jsonwebtoken");
 const User = require("./models/User");
 const {upload} = require("./cloudinary"); // Assuming you have a cloudinary.js file for image uploads
 const app = express();
+
+
 app.use(express.json());
 app.use(cors());
 const authMiddleware = require("./middleware/authMiddleware");
