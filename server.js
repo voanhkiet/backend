@@ -80,21 +80,36 @@ app.post("/login", async (req, res) => {
     let { email, password } = req.body;
     email = email.trim().toLowerCase();
     password = password.trim();
+
+    console.log("🔐 Login attempt:");
+    console.log("Email entered:", email);
+    console.log("Password entered:", password);
+
     const user = await User.findOne({ email });
+    console.log("User found in DB:", !!user);
+
     if (!user) return res.status(400).json({ message: "User not found" });
 
+    console.log("Stored bcrypt hash:", user.password);
+
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log("Password match result:", isMatch);
+
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "2h",
     });
 
+    console.log("✅ Token created:", token);
     res.json({ token });
   } catch (err) {
+    console.error("❌ Login error:", err.message);
     res.status(500).json({ message: err.message });
   }
 });
+
+
 
 // 🎨 Get all paintings
 app.get("/paintings", async (req, res) => {
