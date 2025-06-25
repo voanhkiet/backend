@@ -11,29 +11,33 @@ require("dotenv").config();
 const app = express();
 
 // 👇 Add your deployed frontend domain here
-const allowedOrigins = ["https://frontend-iota-ebon-74.vercel.app"];
+const allowedOrigins = [
+  "https://frontend-iota-ebon-74.vercel.app",
+  "http://localhost:3000", // ✅ for local dev
+  "https://frontend-9jvfjkcdh-kiets-projects-dca671b9.vercel.app", // ✅ extra deploy
+];
 
 app.use(express.json());
-
 
 app.use((req, res, next) => {
   console.log("🔍 Origin:", req.headers.origin);
   next();
 });
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true
-}));
-
-
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.warn("🚫 Blocked by CORS:", origin);
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
+  })
+);
 
 app.use(require("./middleware/errorHandler"));
 
@@ -55,7 +59,8 @@ app.post("/register", async (req, res) => {
     email = email.trim().toLowerCase();
     password = password.trim();
     const existing = await User.findOne({ email });
-    if (existing) return res.status(400).json({ message: "User already exists" });
+    if (existing)
+      return res.status(400).json({ message: "User already exists" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ email, password: hashedPassword });
@@ -76,7 +81,8 @@ app.post("/signup", async (req, res) => {
     if (!email || !password) throw new Error("Missing fields");
 
     const existing = await User.findOne({ email });
-    if (existing) return res.status(400).json({ message: "User already exists" });
+    if (existing)
+      return res.status(400).json({ message: "User already exists" });
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ email, password: hashedPassword });
@@ -110,7 +116,8 @@ app.post("/login", async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     console.log("Password match result:", isMatch);
 
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+    if (!isMatch)
+      return res.status(400).json({ message: "Invalid credentials" });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "2h",
@@ -123,8 +130,6 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
-
 
 // 🎨 Get all paintings
 app.get("/paintings", async (req, res) => {
@@ -176,7 +181,6 @@ app.post("/reset-password", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
 
 // 🚀 Start server
 app.listen(5000, () => console.log("Server running on port 5000"));
