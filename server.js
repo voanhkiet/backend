@@ -33,8 +33,7 @@ app.use(cors({
   credentials: true
 }));
 
-// This line handles preflight OPTIONS requests for all routes
-app.options("*", cors());
+
 
 app.use(require("./middleware/errorHandler"));
 
