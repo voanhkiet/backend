@@ -14,11 +14,27 @@ const app = express();
 const allowedOrigins = ["https://frontend-iota-ebon-74.vercel.app"];
 
 app.use(express.json());
+
+
+app.use((req, res, next) => {
+  console.log("🔍 Origin:", req.headers.origin);
+  next();
+});
+
 app.use(cors({
-  origin: allowedOrigins,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true
 }));
+
+// This line handles preflight OPTIONS requests for all routes
+app.options("*", cors());
 
 app.use(require("./middleware/errorHandler"));
 
