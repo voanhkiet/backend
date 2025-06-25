@@ -8,10 +8,16 @@ const {upload} = require("./cloudinary"); // Assuming you have a cloudinary.js f
 const authMiddleware = require("./middleware/authMiddleware");
 require('dotenv').config();
 const app = express();
-
+const allowedOrigins = ["https://fronted-iota-ebon-74.vercel.app"];
 
 app.use(express.json());
-app.use(cors());
+app.use(cors(
+    {
+        origin: allowedOrigins,
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        credentials: true, // Allow cookies to be sent
+    }
+));
 app.use(require("./middleware/errorHandler"));
 
 mongoose.connect(process.env.MONGODB_URI);
