@@ -178,8 +178,8 @@ app.post("/reset-password", async (req, res) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     console.log("New hashed password:", hashedPassword);
 
-    user.password = hashedPassword;
-    await user.save();
+    await User.updateOne({ email }, { password: hashedPassword });
+    console.log("🔁 Forced password update via updateOne");
 
     console.log("✅ Password updated for:", user.email);
 
