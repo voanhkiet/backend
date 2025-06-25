@@ -38,7 +38,7 @@ app.post("/register", async (req, res) => {
   try {
     let { email, password } = req.body;
     email = email.trim().toLowerCase();
-
+    password = password.trim();
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ message: "User already exists" });
 
@@ -57,6 +57,7 @@ app.post("/signup", async (req, res) => {
   try {
     let { email, password } = req.body;
     email = email.trim().toLowerCase();
+    password = password.trim();
     if (!email || !password) throw new Error("Missing fields");
 
     const existing = await User.findOne({ email });
@@ -78,7 +79,7 @@ app.post("/login", async (req, res) => {
   try {
     let { email, password } = req.body;
     email = email.trim().toLowerCase();
-
+    password = password.trim();
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "User not found" });
 
