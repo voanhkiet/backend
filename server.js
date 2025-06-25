@@ -4,7 +4,7 @@ const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("./models/User");
-
+const {upload} = require("./cloudinary"); // Assuming you have a cloudinary.js file for image uploads
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -74,6 +74,13 @@ app.post("/paintings", authMiddleware, async (req, res) => {
     }
 });
 
+app.post("/upload", upload.single("image"), async (req, res) => {
+    try{
+        res.json({ imageUrl: req.file.path }); // this is the cloudinary URL of the uploaded image
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
 
 
 
