@@ -169,15 +169,23 @@ app.post("/reset-password", async (req, res) => {
     email = email.trim().toLowerCase();
     newPassword = newPassword.trim();
 
+    console.log("🔁 Reset request for:", email);
+    console.log("New password (raw):", newPassword);
+
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "User not found" });
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
+    console.log("New hashed password:", hashedPassword);
+
     user.password = hashedPassword;
     await user.save();
 
+    console.log("✅ Password updated for:", user.email);
+
     res.json({ message: "Password reset successful" });
   } catch (err) {
+    console.error("❌ Reset error:", err.message);
     res.status(500).json({ message: err.message });
   }
 });
