@@ -4,98 +4,55 @@ const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("./models/User");
-const {upload} = require("./cloudinary"); // Assuming you have a cloudinary.js file for image uploads
+const { upload } = require("./cloudinary");
 const authMiddleware = require("./middleware/authMiddleware");
-require('dotenv').config();
+require("dotenv").config();
+
 const app = express();
+
+// 👇 Add your deployed frontend domain here
 const allowedOrigins = ["https://frontend-iota-ebon-74.vercel.app"];
 
 app.use(express.json());
-app.use(cors(
-    {
-        origin: allowedOrigins,
-        methods: ["GET", "POST", "PUT", "DELETE"],
-        credentials: true, // Allow cookies to be sent
-    }
-));
+app.use(cors({
+  origin: allowedOrigins,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true
+}));
+
 app.use(require("./middleware/errorHandler"));
 
 mongoose.connect(process.env.MONGODB_URI);
 
+// 🎨 Painting model
 const PaintingSchema = new mongoose.Schema({
-    title: String,
-    price: Number, // Changed "Price" to "price"
-    imageUrl: String,
+  title: String,
+  price: Number,
+  imageUrl: String,
 });
 
 const Painting = mongoose.model("Painting", PaintingSchema);
 
-// Register route
+// 👤 Register route (optional)
 app.post("/register", async (req, res) => {
-    try {
-        let { email, password } = req.body;
-        email = email.trim().toLowerCase(); // Normalize email
-        const existing = await User.findOne({ email });
-        if (existing) return res.status(400).json({ message: "User already exists" });
-
-        const newUser = new User({ email, password });
-        await newUser.save();
-
-        res.status(201).json({ message: "User created" });
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-// Login route
-app.post("/login", async (req, res) => {
-    try {
-        let { email, password } = req.body;
-         email = email.trim().toLowerCase();
-        const user = await User.findOne({   email });
-        if (!user) return res.status(400).json({ message: "User not found" }); // Fixed "credentails" to "credentials"
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
-
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { 
-            expiresIn: "2h"
-         });
-
-         res.json({token});
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-app.get("/paintings", async (req, res) => {  // Fixed "asyns" to "async"
-    const { page = 1, limit = 10} = req.query;
-    const paintings = await Painting.find()
-        .limit(limit * 1)
-        .skip((page - 1) * limit);
-    res.json(paintings);
-});
-
-app.post("/paintings", authMiddleware, async (req, res) => {
-    try {
-        const newPainting = new Painting(req.body);
-        await newPainting.save();
-        res.status(201).json(newPainting);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-});
-
-app.post("/upload", upload.single("image"), async (req, res) => {
   try {
-    if (!req.file) throw new Error("No file uploaded!");
-    console.log("✔️ Received file:", req.file);
-    res.json({ imageUrl: req.file.path });
-  } catch (error) {
-    console.error("❌ Upload failed:", error);
-    res.status(500).json({ message: error.message });
+    let { email, password } = req.body;
+    email = email.trim().toLowerCase();
+
+    const existing = await User.findOne({ email });
+    if (existing) return res.status(400).json({ message: "User already exists" });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({ email, password: hashedPassword });
+    await newUser.save();
+
+    res.status(201).json({ message: "User created" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 
+// ✅ Signup route (preferred)
 app.post("/signup", async (req, res) => {
   try {
     let { email, password } = req.body;
@@ -116,9 +73,59 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+// 🔐 Login route
+app.post("/login", async (req, res) => {
+  try {
+    let { email, password } = req.body;
+    email = email.trim().toLowerCase();
 
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: "User not found" });
 
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "2h",
+    });
 
+    res.json({ token });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
+// 🎨 Get all paintings
+app.get("/paintings", async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
+  const paintings = await Painting.find()
+    .limit(limit * 1)
+    .skip((page - 1) * limit);
+  res.json(paintings);
+});
+
+// 🖼️ Add a painting (protected route)
+app.post("/paintings", authMiddleware, async (req, res) => {
+  try {
+    const newPainting = new Painting(req.body);
+    await newPainting.save();
+    res.status(201).json(newPainting);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// 📦 Image upload route
+app.post("/upload", upload.single("image"), async (req, res) => {
+  try {
+    if (!req.file) throw new Error("No file uploaded!");
+    console.log("✔️ Received file:", req.file);
+    res.json({ imageUrl: req.file.path });
+  } catch (error) {
+    console.error("❌ Upload failed:", error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// 🚀 Start server
 app.listen(5000, () => console.log("Server running on port 5000"));
