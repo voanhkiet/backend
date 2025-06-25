@@ -8,7 +8,7 @@ const {upload} = require("./cloudinary"); // Assuming you have a cloudinary.js f
 const authMiddleware = require("./middleware/authMiddleware");
 require('dotenv').config();
 const app = express();
-const allowedOrigins = ["https://fronted-iota-ebon-74.vercel.app"];
+const allowedOrigins = ["https://frontend-iota-ebon-74.vercel.app"];
 
 app.use(express.json());
 app.use(cors(
