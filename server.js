@@ -5,14 +5,15 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("./models/User");
 const {upload} = require("./cloudinary"); // Assuming you have a cloudinary.js file for image uploads
+const authMiddleware = require("./middleware/authMiddleware");
+require('dotenv').config();
 const app = express();
 
 
 app.use(express.json());
 app.use(cors());
-const authMiddleware = require("./middleware/authMiddleware");
 app.use(require("./middleware/errorHandler"));
-require('dotenv').config();
+
 mongoose.connect(process.env.MONGODB_URI);
 
 const PaintingSchema = new mongoose.Schema({
@@ -87,6 +88,19 @@ app.post("/upload", upload.single("image"), async (req, res) => {
   }
 });
 
+app.post("/signup", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        // create user logic here
+        res.status(201).json({ message: "User created successfully" 
+
+        });
+    } catch (error) {
+        console.error("❌ Signup failed:", error);
+        res.status(500).json({ message: error.message });
+    }
+
+});
 
 
 
