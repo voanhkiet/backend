@@ -78,8 +78,10 @@ app.post("/paintings", authMiddleware, async (req, res) => {
 
 app.post("/upload", upload.single("image"), async (req, res) => {
     try{
+        console.log("FILE RECEIVED:", req.file);
         res.json({ imageUrl: req.file.path }); // this is the cloudinary URL of the uploaded image
     } catch (error) {
+        console.error("UPLOAD ERROR:", error);
         res.status(500).json({ message: error.message });
     }
 });
