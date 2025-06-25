@@ -48,8 +48,8 @@ app.post("/register", async (req, res) => {
 // Login route
 app.post("/login", async (req, res) => {
     try {
-        const { email, password } = req.body;
-         email = req.body.email.toLowerCase();
+        let { email, password } = req.body;
+         email = email.toLowerCase();
         const user = await User.findOne({   email });
         if (!user) return res.status(400).json({ message: "User not found" }); // Fixed "credentails" to "credentials"
 
@@ -97,8 +97,8 @@ app.post("/upload", upload.single("image"), async (req, res) => {
 
 app.post("/signup", async (req, res) => {
   try {
-    const { email, password } = req.body;
-    email = req.body.email.toLowerCase();
+    let { email, password } = req.body;
+    email = email.toLowerCase();
     if (!email || !password) throw new Error("Missing fields");
 
     const existing = await User.findOne({ email });
